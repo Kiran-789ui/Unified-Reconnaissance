@@ -1,0 +1,41 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-navy-950 text-slate-100 antialiased selection:bg-cyan-500/20 selection:text-cyan-300;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  }
+
+  /* Custom cyber scrollbars */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #060b13;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #1e293b;
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #0284c7;
+  }
+}
+
+.cyber-glow {
+  box-shadow: 0 0 15px -3px rgba(0, 229, 255, 0.15);
+}
+
+.cyber-card {
+  @apply bg-navy-900/90 border border-slate-800/80 rounded-xl backdrop-blur-sm transition-all duration-200;
+}
+
+.cyber-card:hover {
+  @apply border-cyan-500/30;
+}

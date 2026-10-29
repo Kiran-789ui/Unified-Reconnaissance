@@ -24,14 +24,17 @@ app.use(
 
 // Secure CORS Configuration
 const allowedOrigin = process.env.CLIENT_URL || 'http://localhost:5173';
+const allowedOrigins = new Set([
+  allowedOrigin,
+  ...(process.env.NODE_ENV === 'production' ? [] : ['http://localhost:5173', 'http://127.0.0.1:5173']),
+]);
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (like mobile apps, curl, postman) or matching origin
-      if (!origin || origin === allowedOrigin || origin === 'http://127.0.0.1:5173') {
+      if (!origin || allowedOrigins.has(origin)) {
         callback(null, true);
       } else {
-        callback(null, true); // Permissive in dev, or origin check
+        callback(new Error('Origin is not allowed by CORS.'));
       }
     },
     credentials: true,

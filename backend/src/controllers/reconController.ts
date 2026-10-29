@@ -6,11 +6,39 @@ import { lookupWhois } from '../services/whoisService.js';
 import { lookupIp } from '../services/ipService.js';
 import { ReconReport, IReconReport } from '../models/ReconReport.js';
 
+function validateReconTarget(targetInput: string) {
+  const validation = validateTarget(targetInput);
+  if (!validation.isValid) return validation;
+
+  const allowedTargets = (process.env.RECON_TARGET_ALLOWLIST || '')
+    .split(',')
+    .map((target) => target.trim().toLowerCase())
+    .filter(Boolean);
+
+  if (process.env.NODE_ENV === 'production' && allowedTargets.length === 0) {
+    return {
+      ...validation,
+      isValid: false,
+      error: 'Reconnaissance is disabled because no public demo target allowlist is configured.',
+    };
+  }
+
+  if (allowedTargets.length > 0 && !allowedTargets.includes(validation.target)) {
+    return {
+      ...validation,
+      isValid: false,
+      error: `This public demo only permits these targets: ${allowedTargets.join(', ')}.`,
+    };
+  }
+
+  return validation;
+}
+
 export const executeFullRecon = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   const startTime = Date.now();
   const targetInput = req.body?.target;
 
-  const validation = validateTarget(targetInput);
+  const validation = validateReconTarget(targetInput);
   if (!validation.isValid) {
     res.status(400).json({
       success: false,
@@ -186,7 +214,7 @@ export const executeFullRecon = async (req: AuthenticatedRequest, res: Response)
 
 export const lookupDomainInfo = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   const targetInput = req.body?.target;
-  const validation = validateTarget(targetInput);
+  const validation = validateReconTarget(targetInput);
   if (!validation.isValid) {
     res.status(400).json({ success: false, message: validation.error });
     return;
@@ -206,7 +234,7 @@ export const lookupDomainInfo = async (req: AuthenticatedRequest, res: Response)
 
 export const lookupDnsEndpoint = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   const targetInput = req.body?.target;
-  const validation = validateTarget(targetInput);
+  const validation = validateReconTarget(targetInput);
   if (!validation.isValid) {
     res.status(400).json({ success: false, message: validation.error });
     return;
@@ -226,7 +254,7 @@ export const lookupDnsEndpoint = async (req: AuthenticatedRequest, res: Response
 
 export const lookupWhoisEndpoint = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   const targetInput = req.body?.target;
-  const validation = validateTarget(targetInput);
+  const validation = validateReconTarget(targetInput);
   if (!validation.isValid) {
     res.status(400).json({ success: false, message: validation.error });
     return;
@@ -246,7 +274,7 @@ export const lookupWhoisEndpoint = async (req: AuthenticatedRequest, res: Respon
 
 export const lookupIpEndpoint = async (req: AuthenticatedRequest, res: Response): Promise<void> => {
   const targetInput = req.body?.target;
-  const validation = validateTarget(targetInput);
+  const validation = validateReconTarget(targetInput);
   if (!validation.isValid) {
     res.status(400).json({ success: false, message: validation.error });
     return;

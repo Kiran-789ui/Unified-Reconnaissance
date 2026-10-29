@@ -1,4 +1,9 @@
-const API_BASE = import.meta.env.VITE_API_URL || '/api';
+const configuredApiUrl = (import.meta.env.VITE_API_URL || '').replace(/\/+$/, '');
+const API_BASE = !configuredApiUrl || configuredApiUrl === '/api'
+  ? '/api'
+  : configuredApiUrl.endsWith('/api')
+    ? configuredApiUrl
+    : `${configuredApiUrl}/api`;
 
 interface RequestOptions extends RequestInit {
   params?: Record<string, string | number | undefined>;

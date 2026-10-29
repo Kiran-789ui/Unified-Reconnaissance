@@ -30,13 +30,15 @@ export const NewScan: React.FC = () => {
   const [scanStep, setScanStep] = useState(0);
 
   // Quick preset samples for educational viva demo
-  const samplePresets = [
-    { label: 'Cloudflare', target: 'cloudflare.com', type: 'domain' },
-    { label: 'Google DNS', target: '8.8.8.8', type: 'ipv4' },
-    { label: 'Wikipedia', target: 'wikipedia.org', type: 'domain' },
-    { label: 'One.One.One.One', target: '1.1.1.1', type: 'ipv4' },
-    { label: 'GitHub', target: 'github.com', type: 'domain' },
-  ];
+  const samplePresets = import.meta.env.VITE_DEMO_MODE === 'true'
+    ? [{ label: 'Example Domain', target: 'example.com', type: 'domain' }]
+    : [
+        { label: 'Cloudflare', target: 'cloudflare.com', type: 'domain' },
+        { label: 'Google DNS', target: '8.8.8.8', type: 'ipv4' },
+        { label: 'Wikipedia', target: 'wikipedia.org', type: 'domain' },
+        { label: 'One.One.One.One', target: '1.1.1.1', type: 'ipv4' },
+        { label: 'GitHub', target: 'github.com', type: 'domain' },
+      ];
 
   // Client-side instant input validator
   useEffect(() => {

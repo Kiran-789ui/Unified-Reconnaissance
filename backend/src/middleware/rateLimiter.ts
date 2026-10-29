@@ -2,6 +2,7 @@ import rateLimit from 'express-rate-limit';
 
 const windowMs = parseInt(process.env.RATE_LIMIT_WINDOW_MS || '900000', 10); // 15 mins default
 const maxRequests = parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '100', 10);
+const reconMaxRequests = parseInt(process.env.RECON_RATE_LIMIT_MAX_REQUESTS || '30', 10);
 
 export const standardLimiter = rateLimit({
   windowMs,
@@ -27,7 +28,7 @@ export const authLimiter = rateLimit({
 
 export const reconLimiter = rateLimit({
   windowMs: 60 * 1000, // 1 minute
-  max: 30, // 30 lookups per minute
+  max: reconMaxRequests,
   standardHeaders: true,
   legacyHeaders: false,
   message: {

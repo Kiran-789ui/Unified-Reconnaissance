@@ -16,6 +16,7 @@ describe('Reconnaissance Services & Endpoints', () => {
   });
 
   beforeEach(() => {
+    vi.unstubAllEnvs();
     vi.restoreAllMocks();
     vi.spyOn(User, 'findById').mockResolvedValue({
       _id: mockUserId,
@@ -44,6 +45,19 @@ describe('Reconnaissance Services & Endpoints', () => {
     expect(res.status).toBe(400);
     expect(res.body.success).toBe(false);
     expect(res.body.message).toMatch(/without URL schemes/i);
+  });
+
+  it('POST /api/recon/full - should reject targets outside the configured public demo allowlist', async () => {
+    vi.stubEnv('RECON_TARGET_ALLOWLIST', 'example.com');
+
+    const res = await request(app)
+      .post('/api/recon/full')
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({ target: 'github.com' });
+
+    expect(res.status).toBe(400);
+    expect(res.body.success).toBe(false);
+    expect(res.body.message).toMatch(/only permits these targets: example\.com/i);
   });
 
   it('POST /api/recon/full - should execute passive recon with mocked services', async () => {

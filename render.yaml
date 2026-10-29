@@ -1,0 +1,42 @@
+services:
+  - type: web
+    name: unified-recon-api
+    runtime: node
+    plan: free
+    rootDir: backend
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: USE_IN_MEMORY_DB
+        value: "true"
+      - key: RECON_TARGET_ALLOWLIST
+        value: example.com
+      - key: RECON_RATE_LIMIT_MAX_REQUESTS
+        value: "5"
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CLIENT_URL
+        fromService:
+          type: web
+          name: unified-recon-web
+          envVarKey: RENDER_EXTERNAL_URL
+  - type: web
+    name: unified-recon-web
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: unified-recon-api
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: VITE_DEMO_MODE
+        value: "true"
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
